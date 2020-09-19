@@ -4,21 +4,23 @@
     <nav-bar class="home-nav">
       <div slot="center">购物街</div>
     </nav-bar>
-
-    <scroll class="scrollContent"  
-            ref="scroll" 
-            @scroll="contentScroll"
-            @pullingUp="loadMore"
-            :probe-type="3" 
-            :pull-up-load="true">
+    <tab-control class="tabControlShowHide" v-show="isTabFixed" ref="tabControl1" :titles="['流行','新款','精选']" @tab-click="tabControlClick"></tab-control>
+    <scroll
+      class="scrollContent"
+      ref="scroll"
+      @scroll="contentScroll"
+      @pullingUp="loadMore"
+      :probe-type="3"
+      :pull-up-load="true"
+    >
       <!-- 轮播图开始 -->
-      <home-swiper :banners="banners"></home-swiper>
+      <home-swiper :banners="banners" @swiperImageLoad.once="swiperImageLoad"></home-swiper>
       <!-- 推荐 -->
       <recommend-view :recommends="recommends"></recommend-view>
       <!-- 本周流行 -->
       <feature></feature>
       <!-- 控制栏 -->
-      <tab-control :titles="['流行','新款','精选']" @tab-click="tabControlClick"></tab-control>
+      <tab-control ref="tabControl2" :titles="['流行','新款','精选']" @tab-click="tabControlClick"></tab-control>
       <!-- 商品列表 -->
       <goods-list :goods="showGoods"></goods-list>
     </scroll>
@@ -36,7 +38,7 @@ import HomeSwiper from "views/home/childComps/HomeSwiper";
 import RecommendView from "views/home/childComps/RecommendView";
 import Feature from "./childComps/Feature";
 import Scroll from "components/common/scroll/Scroll";
-import BackTop from "components/common/backtop/BackTop"
+import BackTop from "components/common/backtop/BackTop";
 
 import { getHomeMutidata, getHomeGoods } from "network/home";
 
@@ -50,7 +52,7 @@ export default {
     Feature,
     GoodsList,
     Scroll,
-    BackTop
+    BackTop,
   },
   data() {
     return {
@@ -62,7 +64,9 @@ export default {
         sell: { page: 0, list: [] },
       },
       currentType: "pop",
-      isShowBackTop:false
+      isShowBackTop: false,
+      tabOffsetTop: 0,
+      isTabFixed: false,
     };
   },
   created() {
@@ -78,12 +82,18 @@ export default {
     showGoods() {
       return this.goods[this.currentType].list;
     },
-
+  },
+  mounted() {
+    // 1.图片加载完成的事件监听
+    this.$bus.$on("itemImageLoad", () => {
+      this.$refs.scroll.scroll && this.$refs.scroll.scroll.refresh();
+    });
   },
   methods: {
     /*
       事件监听相关
     */
+
     tabControlClick(index) {
       switch (index) {
         case 0:
@@ -96,24 +106,33 @@ export default {
           this.currentType = "sell";
           break;
       }
+      this.$refs.tabControl1.currentIndex = index;
+      this.$refs.tabControl2.currentIndex = index;
     },
-    backTopClick(){
+    backTopClick() {
       // 通过 ref 直接访问scroll组件里的scrollTo方法
-      this.$refs.scroll.scrollTo(0,0)
+      this.$refs.scroll.scrollTo(0, 0);
     },
-    contentScroll(index){
-      // 判断当前位置来确定是否显示返回顶部按钮
-      this.isShowBackTop = (-index) > 1000;
+    contentScroll(position) {
+      // 1.判断当前位置来确定是否显示返回顶部按钮
+      this.isShowBackTop = -position.y > 1000;
+
+      // 2.决定tabControl是否吸顶
+      console.log("-position.y: ", -position.y);
+      console.log("tabOffsetTop: ", this.tabOffsetTop);
+      this.isTabFixed = -position.y > this.tabOffsetTop;
     },
-    loadMore(){
-      console.log('上拉加载更多');
-      this.getHomeGoods(this.currentType)
+    loadMore() {
+      this.getHomeGoods(this.currentType);
     },
-    finishPullUp(){
-      // 重新计算可滚动的高度 避免出现有内容 但是拉不动的情况
-      this.$refs.scroll.scroll.refresh();
+    finishPullUp() {
       // 框架的下拉加载更多 回调函数
       this.$refs.scroll.scroll.finishPullUp();
+    },
+    swiperImageLoad() {
+      // 2.获取tabControl的offsetTop
+      // 所有的组件都有一个属性 $el,用于获取组件中的元素
+      this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop;
     },
     /*
       网络请求相关
@@ -129,7 +148,7 @@ export default {
       const page = this.goods[type].page + 1;
       getHomeGoods(type, page).then((res) => {
         //数组的解构赋值 把新请求到的数组追加到变量中
-        this.goods[type].list.push(...res.data.list); 
+        this.goods[type].list.push(...res.data.list);
         // 把最新页数更新到对象
         this.goods[type].page += 1;
 
@@ -143,22 +162,27 @@ export default {
 
 <style scoped>
 #home {
-  padding-top: 44px;
   height: 100vh;
 }
-
 .home-nav {
   background-color: var(--color-tint);
   color: #fff;
-  position: fixed;
+  /* 使用原生滚动需要定位 换为better-scroll就不需要了 */
+  /* position: fixed;
   left: 0;
   right: 0;
-  top: 0;
+  top: 0; */
   z-index: 10;
 }
-.scrollContent{
+.scrollContent {
   height: calc(100vh - 93px);
-  /* height: 300px; */
   overflow: hidden;
+}
+.tabControlShowHide{
+  position: absolute;
+  top: 44px;
+  left: 0;
+  right: 0;
+  z-index: 1000;
 }
 </style>

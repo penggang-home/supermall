@@ -37,21 +37,18 @@ export default {
 
     // 2.监听滚动位置
     this.scroll.on("scroll", (position) => {
-      // console.log('position: ', position);
-      this.$emit("scroll", position.y);
+      this.$emit("scroll", position);
     });
 
     // 3.监听上拉加载更多事件
     this.scroll.on("pullingUp", () => {
       this.$emit('pullingUp')
-      //调用一次这个函数，才能触发下一次。
-      //  this.scroll.finishPullUp();
     });
   },
   methods: {
     scrollTo(x, y, time = 1000) {
       // 调用better-scroll 的scrollTo方法 返回顶部
-      this.scroll.scrollTo(x, y, time);
+      this.scroll && this.scroll.scrollTo(x, y, time);
     },
   },
 };

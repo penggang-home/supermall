@@ -42,9 +42,6 @@ export default {
   display: flex;
   text-align: center;
   background-color: #fff;
-  /* position: sticky;
-  top: 44px; */
-  z-index: 1000;
 }
 .tab-control-item {
   flex: 1;
