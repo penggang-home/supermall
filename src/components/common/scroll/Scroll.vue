@@ -48,8 +48,20 @@ export default {
   methods: {
     scrollTo(x, y, time = 1000) {
       // 调用better-scroll 的scrollTo方法 返回顶部
-      this.scroll && this.scroll.scrollTo(x, y, time);
+      console.log(y);
+      this.scroll.scrollTo(x, y, time);
     },
+    // 重新计算内容高度
+    refresh(){
+      this.scroll && this.scroll.refresh()
+    },
+    // 下拉加载更多的回调函数
+    finishPullUp(){
+      this.scroll && this.scroll.finishPullUp();
+    },
+    getScrollY(){
+      return this.scroll ? this.scroll.y : 0
+    }
   },
 };
 </script>

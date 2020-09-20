@@ -5,28 +5,36 @@
 </template>
 
 <script>
-import GoodsListItem from "./GoodsListItem"
+import GoodsListItem from "./GoodsListItem";
 
 export default {
   name: "GoodsList",
-  components:{
-    GoodsListItem
+  components: {
+    GoodsListItem,
   },
-  props:{
-    goods:{
-      type:Array,
-      default(){
+  props: {
+    goods: {
+      type: Array,
+      default() {
         return [];
-      }
-    }
-  }
+      },
+    },
+  },
 };
 </script>
 
 <style>
-.goods{
+.goods {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
+
+  /* column-count: 2;
+  column-gap: 0; */
+
+  /* display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  height: 1000px; */
 }
 </style>

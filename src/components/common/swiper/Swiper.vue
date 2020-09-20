@@ -1,14 +1,14 @@
 <template>
   <div id="hy-swiper">
-    <div class="swiper" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
+    <div id="swiper" @touchstart="touchStart" @touchmove="touchMove" @touchend="touchEnd">
       <slot></slot>
     </div>
     <slot name="indicator"></slot>
     <div class="indicator">
-      <slot name="indicator" v-if="showIndicator && slideCount>1">
+      <slot name="indicator" v-if="showIndicator && slideCount>=1">
         <div
           v-for="(item, index) in slideCount"
-          class="indi-item"
+          class="indicator-item"
           :class="{active: index === currentIndex-1}"
           :key="index"
         ></div>
@@ -21,22 +21,22 @@
 export default {
   name: "Swiper",
   props: {
-    // 间距
+    //默认3秒换一张图片
     interval: {
       type: Number,
       default: 3000,
     },
-    // 动画时长
+    //延迟多久开始轮播
     animDuration: {
       type: Number,
-      default: 300,
+      default: 200,
     },
-    // 触发滚动比例
+    //默认用户滑动到4/1图片就跳过去
     moveRatio: {
       type: Number,
       default: 0.25,
     },
-    // 指示器
+    //是否显示下方标记
     showIndicator: {
       type: Boolean,
       default: true,
@@ -52,13 +52,15 @@ export default {
     };
   },
   mounted: function () {
-    // 1.操作DOM, 在前后添加Slide
-    setTimeout(() => {
-      this.handleDom();
+    this.$nextTick(() => {
+      // 1.操作DOM, 在前后添加Slide
+      setTimeout(() => {
+        this.handleDom();
 
-      // 2.开启定时器
-      this.startTimer();
-    }, 3000);
+        // 2.开启定时器
+        this.startTimer();
+      }, 500);
+    });
   },
   methods: {
     /**
@@ -127,25 +129,27 @@ export default {
      * 操作DOM, 在DOM前后添加Slide
      */
     handleDom: function () {
-      // 1.获取要操作的元素
-      let swiperEl = document.querySelector(".swiper");
-      let slidesEls = swiperEl.getElementsByClassName("slide");
+      this.$nextTick(() => {
+        // 1.获取要操作的元素
+        let swiperEl = document.querySelector("#swiper");
+        let slidesEls = swiperEl.getElementsByClassName("slide");
 
-      // 2.保存个数
-      this.slideCount = slidesEls.length;
+        // 2.保存个数
+        this.slideCount = slidesEls.length;
 
-      // 3.如果大于1个, 那么在前后分别添加一个slide
-      if (this.slideCount > 1) {
-        let cloneFirst = slidesEls[0].cloneNode(true);
-        let cloneLast = slidesEls[this.slideCount - 1].cloneNode(true);
-        swiperEl.insertBefore(cloneLast, slidesEls[0]);
-        swiperEl.appendChild(cloneFirst);
-        this.totalWidth = swiperEl.offsetWidth;
-        this.swiperStyle = swiperEl.style;
-      }
+        // 3.如果大于1个, 那么在前后分别添加一个slide
+        if (this.slideCount > 1) {
+          let cloneFirst = slidesEls[0].cloneNode(true);
+          let cloneLast = slidesEls[this.slideCount - 1].cloneNode(true);
+          swiperEl.insertBefore(cloneLast, slidesEls[0]);
+          swiperEl.appendChild(cloneFirst);
+          this.totalWidth = swiperEl.offsetWidth;
+          this.swiperStyle = swiperEl.style;
+        }
 
-      // 4.让swiper元素, 显示第一个(目前是显示前面添加的最后一个元素)
-      this.setTransform(-this.totalWidth);
+        // 4.让swiper元素, 显示第一个(目前是显示前面添加的最后一个元素)
+        this.setTransform(-this.totalWidth);
+      });
     },
 
     /**
@@ -233,7 +237,7 @@ export default {
   position: relative;
 }
 
-.swiper {
+#swiper {
   display: flex;
 }
 
@@ -245,7 +249,7 @@ export default {
   bottom: 8px;
 }
 
-.indi-item {
+.indicator-item {
   box-sizing: border-box;
   width: 8px;
   height: 8px;
@@ -257,7 +261,7 @@ export default {
   margin: 0 5px;
 }
 
-.indi-item.active {
+.active {
   background-color: rgba(212, 62, 46, 1);
 }
 </style>

@@ -4,7 +4,13 @@
     <nav-bar class="home-nav">
       <div slot="center">购物街</div>
     </nav-bar>
-    <tab-control class="tabControlShowHide" v-show="isTabFixed" ref="tabControl1" :titles="['流行','新款','精选']" @tab-click="tabControlClick"></tab-control>
+    <tab-control
+      class="tabControlShowHide"
+      v-show="isTabFixed"
+      ref="tabControl1"
+      :titles="['流行','新款','精选']"
+      @tab-click="tabControlClick"
+    ></tab-control>
     <scroll
       class="scrollContent"
       ref="scroll"
@@ -67,6 +73,7 @@ export default {
       isShowBackTop: false,
       tabOffsetTop: 0,
       isTabFixed: false,
+      saveY: 0,
     };
   },
   created() {
@@ -78,16 +85,25 @@ export default {
     this.getHomeGoods("new");
     this.getHomeGoods("sell");
   },
+  mounted() {
+    // 1.图片加载完成的事件监听
+    this.$bus.$on("itemImageLoad", () => {
+      this.$refs.scroll && this.$refs.scroll.refresh();
+    });
+  },
+  // 进入当前组件
+  activated() {
+    this.$refs.scroll.scrollTo(0,this.saveY,0)
+    this.$refs.scroll.refresh();
+  },
+  // 离开当前组件
+  deactivated() {
+    this.saveY = this.$refs.scroll.getScrollY();
+  },
   computed: {
     showGoods() {
       return this.goods[this.currentType].list;
     },
-  },
-  mounted() {
-    // 1.图片加载完成的事件监听
-    this.$bus.$on("itemImageLoad", () => {
-      this.$refs.scroll.scroll && this.$refs.scroll.scroll.refresh();
-    });
   },
   methods: {
     /*
@@ -118,16 +134,10 @@ export default {
       this.isShowBackTop = -position.y > 1000;
 
       // 2.决定tabControl是否吸顶
-      console.log("-position.y: ", -position.y);
-      console.log("tabOffsetTop: ", this.tabOffsetTop);
       this.isTabFixed = -position.y > this.tabOffsetTop;
     },
     loadMore() {
       this.getHomeGoods(this.currentType);
-    },
-    finishPullUp() {
-      // 框架的下拉加载更多 回调函数
-      this.$refs.scroll.scroll.finishPullUp();
     },
     swiperImageLoad() {
       // 2.获取tabControl的offsetTop
@@ -153,7 +163,7 @@ export default {
         this.goods[type].page += 1;
 
         //如果获取到数据 调用框架的finishPullUp() 让它能够执行下一次下拉加载更多
-        this.finishPullUp();
+        this.$refs.scroll && this.$refs.scroll.finishPullUp();
       });
     },
   },
@@ -178,7 +188,7 @@ export default {
   height: calc(100vh - 93px);
   overflow: hidden;
 }
-.tabControlShowHide{
+.tabControlShowHide {
   position: absolute;
   top: 44px;
   left: 0;
