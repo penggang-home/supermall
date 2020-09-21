@@ -61,6 +61,7 @@ export default {
         this.startTimer();
       }, 500);
     });
+
   },
   methods: {
     /**

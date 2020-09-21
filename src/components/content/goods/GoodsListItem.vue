@@ -27,6 +27,12 @@ export default {
     },
     goodsItemClick() {
       this.$router.push("/detail/" + this.goodsItem.iid);
+      // this.$router.push({
+      //   url:"/detail",
+      //   query:{
+      //     iid:this.goodsItem.iid
+      //   }
+      // })
     },
   },
 };

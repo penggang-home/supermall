@@ -76,40 +76,10 @@ export default {
       saveY: 0,
     };
   },
-  created() {
-    // 1.请求我们的多个数据
-    this.getHomeMutidata();
-
-    // 2.请求商品数据
-    this.getHomeGoods("pop");
-    this.getHomeGoods("new");
-    this.getHomeGoods("sell");
-  },
-  mounted() {
-    // 1.图片加载完成的事件监听
-    this.$bus.$on("itemImageLoad", () => {
-      this.$refs.scroll && this.$refs.scroll.refresh();
-    });
-  },
-  // 进入当前组件
-  activated() {
-    this.$refs.scroll.scrollTo(0,this.saveY,0)
-    this.$refs.scroll.refresh();
-  },
-  // 离开当前组件
-  deactivated() {
-    this.saveY = this.$refs.scroll.getScrollY();
-  },
-  computed: {
-    showGoods() {
-      return this.goods[this.currentType].list;
-    },
-  },
   methods: {
     /*
       事件监听相关
     */
-
     tabControlClick(index) {
       switch (index) {
         case 0:
@@ -125,25 +95,30 @@ export default {
       this.$refs.tabControl1.currentIndex = index;
       this.$refs.tabControl2.currentIndex = index;
     },
+
     backTopClick() {
       // 通过 ref 直接访问scroll组件里的scrollTo方法
       this.$refs.scroll.scrollTo(0, 0);
     },
+
     contentScroll(position) {
       // 1.判断当前位置来确定是否显示返回顶部按钮
       this.isShowBackTop = -position.y > 1000;
 
       // 2.决定tabControl是否吸顶
-      this.isTabFixed = -position.y > this.tabOffsetTop;
+      this.isTabFixed = this.tabOffsetTop <= -position.y + 44;
     },
+
     loadMore() {
       this.getHomeGoods(this.currentType);
     },
+
     swiperImageLoad() {
       // 2.获取tabControl的offsetTop
       // 所有的组件都有一个属性 $el,用于获取组件中的元素
       this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop;
     },
+
     /*
       网络请求相关
     */
@@ -153,6 +128,7 @@ export default {
         this.recommends = res.data.recommend.list;
       });
     },
+
     getHomeGoods(type) {
       // 当前页的 下一页
       const page = this.goods[type].page + 1;
@@ -166,6 +142,43 @@ export default {
         this.$refs.scroll && this.$refs.scroll.finishPullUp();
       });
     },
+  },
+  computed: {
+    showGoods() {
+      return this.goods[this.currentType].list;
+    },
+  },
+
+  created() {
+    // 1.请求我们的多个数据
+    this.getHomeMutidata();
+
+    // 2.请求商品数据
+    this.getHomeGoods("pop");
+    this.getHomeGoods("new");
+    this.getHomeGoods("sell");
+  },
+  mounted() {
+    // 1.图片加载完成的事件监听
+    this.$refs.scroll.scrollTo(0, this.saveY, 0);
+
+    this.$bus.$on("itemImageLoad", () => {
+      this.$refs.scroll && this.$refs.scroll.refresh();
+    });
+  },
+  // 进入本组件时触发
+  activated() {
+    //一进入组件就滚动到离开时保存的位置
+    this.$refs.scroll && this.$refs.scroll.scrollTo(0, this.saveY, 10);
+    //refresh():重新计算 better-scroll,
+    this.$refs.scroll && this.$refs.scroll.refresh();
+  },
+
+  deactivated() {
+    //离开本组件时触发
+
+    //1、保存离开时的位置
+    this.saveY = this.$refs.scroll.getScrollY();
   },
 };
 </script>

@@ -28,13 +28,5 @@ export default {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
-
-  /* column-count: 2;
-  column-gap: 0; */
-
-  /* display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  height: 1000px; */
 }
 </style>
