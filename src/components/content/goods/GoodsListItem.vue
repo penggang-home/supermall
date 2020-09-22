@@ -1,6 +1,6 @@
 <template>
   <div class="goods-item" @click="goodsItemClick">
-    <img :src="goodsItem.show.img" alt @load="imageLoad" />
+    <img :src="showImage" alt @load="imageLoad" />
     <div class="goods-info">
       <p>{{goodsItem.title}}</p>
       <span class="price">{{goodsItem.price}}</span>
@@ -20,10 +20,19 @@ export default {
       },
     },
   },
+  computed: {
+    showImage(){
+      return this.goodsItem.image||  this.goodsItem.show.img
+    }
+  },
   methods: {
     // 每加载一张图片都会调用这个方法
     imageLoad() {
-      this.$bus.$emit("itemImageLoad");
+      if(this.$route.path.indexOf('home')){
+        this.$bus.$emit("HomeItemImageLoad");
+      }else if(this.$route.path.indexOf('/detail')){
+        this.$bus.$emit("DetailItemImageLoad");
+      }
     },
     goodsItemClick() {
       this.$router.push("/detail/" + this.goodsItem.iid);

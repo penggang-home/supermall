@@ -14,7 +14,7 @@ export default {
   props: {
     probeType: {
       type: Number,
-      default: 1, //默认不开启
+      default: 0, //默认不开启
     },
     pullUpLoad: {
       type: Boolean,

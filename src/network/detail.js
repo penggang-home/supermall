@@ -1,5 +1,6 @@
 import { request } from "./request"
 
+// 详情页的相关数据
 export function getDetail(iid) {
   return request({
     url: '/detail',
@@ -8,6 +9,16 @@ export function getDetail(iid) {
     }
   })
 }
+/**
+ * 请求推荐信息
+ * @returns {AxiosPromise}
+ */
+export function getRecommend() {
+  return request({
+    url: '/recommend'
+  })
+}
+
 // 商品信息
 export class GooodsInfo {
   constructor(itemInfo, columns, services) {
@@ -47,3 +58,5 @@ export class GoodsParam {
     }
   }
 }
+
+

@@ -74,6 +74,7 @@ export default {
       tabOffsetTop: 0,
       isTabFixed: false,
       saveY: 0,
+      itemImgListener: null,
     };
   },
   methods: {
@@ -95,12 +96,10 @@ export default {
       this.$refs.tabControl1.currentIndex = index;
       this.$refs.tabControl2.currentIndex = index;
     },
-
     backTopClick() {
       // 通过 ref 直接访问scroll组件里的scrollTo方法
       this.$refs.scroll.scrollTo(0, 0);
     },
-
     contentScroll(position) {
       // 1.判断当前位置来确定是否显示返回顶部按钮
       this.isShowBackTop = -position.y > 1000;
@@ -108,17 +107,14 @@ export default {
       // 2.决定tabControl是否吸顶
       this.isTabFixed = this.tabOffsetTop <= -position.y + 44;
     },
-
     loadMore() {
       this.getHomeGoods(this.currentType);
     },
-
     swiperImageLoad() {
       // 2.获取tabControl的offsetTop
       // 所有的组件都有一个属性 $el,用于获取组件中的元素
       this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop;
     },
-
     /*
       网络请求相关
     */
@@ -128,7 +124,6 @@ export default {
         this.recommends = res.data.recommend.list;
       });
     },
-
     getHomeGoods(type) {
       // 当前页的 下一页
       const page = this.goods[type].page + 1;
@@ -148,7 +143,6 @@ export default {
       return this.goods[this.currentType].list;
     },
   },
-
   created() {
     // 1.请求我们的多个数据
     this.getHomeMutidata();
@@ -162,9 +156,11 @@ export default {
     // 1.图片加载完成的事件监听
     this.$refs.scroll.scrollTo(0, this.saveY, 0);
 
-    this.$bus.$on("itemImageLoad", () => {
+    // 2.对监听的事件进行保存
+    this.itemImgListener = () => {
       this.$refs.scroll && this.$refs.scroll.refresh();
-    });
+    };
+    this.$bus.$on("HomeItemImageLoad", this.itemImgListener);
   },
   // 进入本组件时触发
   activated() {
@@ -179,6 +175,9 @@ export default {
 
     //1、保存离开时的位置
     this.saveY = this.$refs.scroll.getScrollY();
+
+    // 2.取消由于组件复用导致的图片加载发送的事件  这里使用另外一种方法通过路由判断是否发送
+    // this.$bus.$off("itemImageLoad", itemImgListener);
   },
 };
 </script>
