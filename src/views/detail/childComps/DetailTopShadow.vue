@@ -1,8 +1,8 @@
 <template>
-  <div class="detail-nav-bar">
+  <div class="detail-nav-bar-shadow">
     <nav-bar>
       <div slot="left" class="left" @click="backClick">
-        <img src="~assets/img/common/back.svg" alt />
+        <img src="~assets/img/common/backWhite.svg" alt />
       </div>
       <div slot="center" class="title">
         <div
@@ -14,7 +14,7 @@
         >{{item}}</div>
       </div>
       <div slot="right" class="right">
-        <img src="~assets/img/common/shopcart.svg" alt="">
+        <img src="~assets/img/common/shopcartWhite.svg" alt="">
       </div>
     </nav-bar>
   </div>
@@ -24,24 +24,25 @@
 import NavBar from "components/common/navbar/NavBar";
 
 export default {
-  name: "DetailNavaBar",
+  name: "DetailTopShadow",
   components: {
     NavBar,
   },
   data() {
     return {
-      titles: ["商品", "参数", "评论", "推荐"],
+      // titles: ["商品", "参数", "评论", "推荐"],
+      titles: [],
       currentIndex: 0,
     };
   },
   methods: {
     titleItemClick(index) {
       this.currentIndex = index;
-      this.$emit("NavBarClick", index);
+      this.$emit("NavBarClick",index)
     },
-    backClick() {
+    backClick(){
       this.$router.back();
-    },
+    }
   },
 };
 </script>
@@ -58,17 +59,19 @@ export default {
 .active {
   color: var(--color-high-text);
 }
-.left {
+.left{
   display: flex;
   justify-content: center;
   align-content: center;
 }
-.detail-nav-bar {
+.detail-nav-bar-shadow {
   position: absolute;
-  z-index: 1000;
+  z-index: 900;
   left: 0;
   right: 0;
-  background-color: #fff;
-  transition: opacity 0.3s;
+  transition: opacity .3s;
+}
+.nav-bar{
+  box-shadow: 0 0 0 0;
 }
 </style>

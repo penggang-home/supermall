@@ -1,5 +1,5 @@
 <template>
-  <div id="tab-bar">
+  <div id="tab-bar" v-if="$route.path.indexOf('/detail') == -1">
     <slot></slot>
   </div>
 </template>

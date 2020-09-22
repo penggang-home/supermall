@@ -113,7 +113,7 @@ export default {
 }
 
 .info-list img {
-  padding: 20px 5px 20px 5px;
+  padding: 20px 0px 20px 0px;
   max-width: 100%;
 }
 </style>

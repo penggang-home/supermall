@@ -1,10 +1,13 @@
 <template>
   <div id="detail">
-    <detail-nav-bar ref="navBar" @NavBarClick="NavBarClick" class="detail-nav-bar" />
+    <detail-top-shadow></detail-top-shadow>
+    <detail-nav-bar ref="navBar" @NavBarClick="NavBarClick" :style="{'opacity':NavBarOpacity}" />
     <scroll
       class="detail-content"
       ref="scroll"
+      
       :pull-up-load="true"
+      @pullingUp="pullingUp"
       @scroll="contentscroll"
       :probe-type="3"
     >
@@ -15,6 +18,7 @@
       <detail-param-info :param-info="paramInfo" ref="params"></detail-param-info>
       <detail-comment-info :comment-info="commentInfo" ref="comment"></detail-comment-info>
       <goods-list :goods="Recommend" ref="recommend"></goods-list>
+      <detail-base-line></detail-base-line>
     </scroll>
   </div>
 </template>
@@ -28,6 +32,9 @@ import DetailShopInfo from "./childComps/DetailShopInfo";
 import DetailGoodsInfo from "./childComps/DetailGoodsInfo";
 import DetailParamInfo from "./childComps/DetailParamInfo";
 import DetailCommentInfo from "./childComps/DetailCommentInfo";
+import DetailBaseLine from "./childComps/DetailBaseLine"
+
+import DetailTopShadow from "./childComps/DetailTopShadow";
 
 // 封装的公共组件
 import GoodsList from "components/content/goods/GoodsList";
@@ -54,6 +61,8 @@ export default {
     DetailParamInfo, //尺码信息
     DetailCommentInfo, //评论信息
     GoodsList, //推荐信息
+    DetailTopShadow, //顶部的底层阴影
+    DetailBaseLine,//底线
   },
   data() {
     return {
@@ -66,7 +75,9 @@ export default {
       commentInfo: {}, //评论信息
       Recommend: [], //推荐信息
       themeTopY: [], //距离顶部的offsetTop
-      currentIndex: 0,
+      NavBarCurrentIndex: 0, //存储需要更新到子组件导航栏的选中信息
+      positionY: 0,
+      NavBarOpacity: 0,
     };
   },
   methods: {
@@ -83,46 +94,55 @@ export default {
       }
       console.log(this.themeTopY);
     },
-
     // 2.导航栏点击
     NavBarClick(index) {
       this.$refs.scroll.scrollTo(0, -this.themeTopY[index] + 44, 0);
     },
+
+    // pullingUp
+    pullingUp() {
+      this.$refs.scroll.finishPullUp(); //每次上拉结束后，需要执行这个操作
+    },
     // 3.监听页面滚动 并且更新子组件选中状态
     contentscroll(position) {
       // 1.获取Y值
-      const positionY = -position.y + 44;
+      this.positionY = -position.y + 44;
 
-      // 2. positionY和导航栏的值经进行对比
-
-      //这种方法不够灵活，而且调用频繁
-      // if (positionY >= 0 && positionY < this.themeTopY[1]) {
+      // 2.1 这种方法不够灵活，而且调用频繁
+      // if (this.positionY >= 0 && this.positionY < this.themeTopY[1]) {
       //   this.NavBarCurrentIndex = 0;
       // } else if (
-      //   positionY >= this.themeTopY[1] &&
-      //   positionY < this.themeTopY[2]
+      //   this.positionY >= this.themeTopY[1] &&
+      //   this.positionY < this.themeTopY[2]
       // ) {
       //   this.NavBarCurrentIndex = 1;
       // } else if (
-      //   positionY >= this.themeTopY[2] &&
-      //   positionY < this.themeTopY[3]
+      //   this.positionY >= this.themeTopY[2] &&
+      //   this.positionY < this.themeTopY[3]
       // ) {
       //   this.NavBarCurrentIndex = 2;
       // } else {
       //   this.NavBarCurrentIndex = 3;
       // }
 
-      //大神写法
+      // 2.2 大神写法
       for (let i = 0; i < this.themeTopY.length - 1; i++) {
         if (
           this.NavBarCurrentIndex !== i &&
-          positionY >= this.themeTopY[i] &&
-          positionY < this.themeTopY[i + 1]
+          this.positionY >= this.themeTopY[i] &&
+          this.positionY < this.themeTopY[i + 1]
         ) {
-          this.currentIndex = i;
+          this.NavBarCurrentIndex = i;
           //更新子组件状态
-          this.$refs.navBar.currentIndex = this.currentIndex;
+          this.$refs.navBar.currentIndex = this.NavBarCurrentIndex;
         }
+      }
+
+      // 2.3 判断导航栏是否显示
+      if (this.positionY > 200) {
+        this.NavBarOpacity = 100;
+      } else {
+        this.NavBarOpacity = 0;
       }
     },
   },
@@ -177,12 +197,11 @@ export default {
   z-index: 1000;
   background-color: white;
 }
-.detail-nav-bar {
-  position: relative;
-  z-index: 1000;
-  background-color: #fff;
-}
 .detail-content {
-  height: calc(100vh - 44px);
+  height: calc(100vh);
+  overflow: hidden;
+}
+.opacity {
+  opacity: 100;
 }
 </style>

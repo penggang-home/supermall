@@ -32,7 +32,8 @@ export default {
     this.scroll = new BScroll(this.$refs.wrapper, {
       probeType: this.probeType, //开启实时监听滚动位置
       click: true,
-      pullUpLoad: this.pullUpLoad,
+      pullUpLoad: this.pullUpLoad, //上拉加载更多
+      mouseWheel: false, //关闭鼠标滚轮滚动
     });
 
     // 2.监听滚动位置
@@ -42,26 +43,28 @@ export default {
 
     // 3.监听上拉加载更多事件
     this.scroll.on("pullingUp", () => {
-      this.$emit('pullingUp')
+      this.$emit("pullingUp");
     });
   },
   methods: {
+    // 1.调用better-scroll 的scrollTo方法 返回顶部
     scrollTo(x, y, time = 1000) {
-      // 调用better-scroll 的scrollTo方法 返回顶部
       this.scroll.scrollTo(x, y, time);
     },
-    // 重新计算内容高度
-    refresh(){
-      this.scroll && this.scroll.refresh()
-    },
-    // 下拉加载更多的回调函数
-    finishPullUp(){
+    // 2.重新计算内容高度
+    refresh() {
       this.scroll && this.scroll.refresh();
-      this.scroll && this.scroll.finishPullUp();
     },
-    getScrollY(){
-      return this.scroll ? this.scroll.y : 0
-    }
+    // 3.下拉加载更多的回调函数
+    finishPullUp() {
+      console.log('下拉加载更多');
+      this.scroll && this.scroll.finishPullUp();
+      this.scroll && this.scroll.refresh();
+    },
+    // 4.获取当前所在高度
+    getScrollY() {
+      return this.scroll ? this.scroll.y : 0;
+    },
   },
 };
 </script>

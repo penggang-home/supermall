@@ -29,6 +29,15 @@ export default {
 .left,
 .right {
   width: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.left img{
+  width: 22px;
+}
+.right img{
+  width: 26px;
 }
 .center{
   flex:1;
