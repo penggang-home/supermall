@@ -32,8 +32,8 @@ export default {
     this.scroll = new BScroll(this.$refs.wrapper, {
       probeType: this.probeType, //开启实时监听滚动位置
       click: true,
-      pullUpLoad: this.pullUpLoad, //上拉加载更多
       mouseWheel: false, //关闭鼠标滚轮滚动
+      pullUpLoad: this.pullUpLoad, //上拉加载更多
     });
 
     // 2.监听滚动位置
@@ -57,7 +57,6 @@ export default {
     },
     // 3.下拉加载更多的回调函数
     finishPullUp() {
-      console.log('下拉加载更多');
       this.scroll && this.scroll.finishPullUp();
       this.scroll && this.scroll.refresh();
     },

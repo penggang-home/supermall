@@ -12,8 +12,12 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .base-line {
+  position: absolute;
+  bottom: -34px;
+  left: 0;
+  right: 0;
   padding: 10px 0px;
   background-color: #f2f2f2;
   text-align: center;

@@ -5,7 +5,7 @@
  * @param delay
  * @returns {function(...[*]=)}
  */
-export function debounce (func, delay = 50) {
+export function debounce(func, delay = 50) {
   let timer = null;
   return function (...args) {
     if (timer) {
@@ -23,7 +23,7 @@ export function debounce (func, delay = 50) {
  * @param fmt
  * @returns {*}
  */
-export function formatDate (date, fmt) {
+export function formatDate(date, fmt) {
   // 1.获取年份
   // Y+ 正则表达式规则 
   if (/(y+)/.test(fmt)) {
@@ -44,9 +44,9 @@ export function formatDate (date, fmt) {
     }
   }
   return fmt;
-};
+}
 
-function padLeftZero (str) {
+function padLeftZero(str) {
   return ('00' + str).substr(str.length);
-};
+}
 

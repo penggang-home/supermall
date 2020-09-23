@@ -44,9 +44,9 @@ import HomeSwiper from "views/home/childComps/HomeSwiper";
 import RecommendView from "views/home/childComps/RecommendView";
 import Feature from "./childComps/Feature";
 import Scroll from "components/common/scroll/Scroll";
-import BackTop from "components/common/backtop/BackTop";
 
 import { getHomeMutidata, getHomeGoods } from "network/home";
+import { backTopMixin } from "commonjs/mixin";
 
 export default {
   name: "Home",
@@ -58,8 +58,9 @@ export default {
     Feature,
     GoodsList,
     Scroll,
-    BackTop,
   },
+  // 混入
+  mixins:[backTopMixin],
   data() {
     return {
       banners: [],
@@ -70,7 +71,6 @@ export default {
         sell: { page: 0, list: [] },
       },
       currentType: "pop",
-      isShowBackTop: false,
       tabOffsetTop: 0,
       isTabFixed: false,
       saveY: 0,
@@ -96,13 +96,10 @@ export default {
       this.$refs.tabControl1.currentIndex = index;
       this.$refs.tabControl2.currentIndex = index;
     },
-    backTopClick() {
-      // 通过 ref 直接访问scroll组件里的scrollTo方法
-      this.$refs.scroll.scrollTo(0, 0);
-    },
+
     contentScroll(position) {
       // 1.判断当前位置来确定是否显示返回顶部按钮
-      this.isShowBackTop = -position.y > 1000;
+      this.isShowBackTop = -position.y > 500;
 
       // 2.决定tabControl是否吸顶
       this.isTabFixed = this.tabOffsetTop <= -position.y + 44;

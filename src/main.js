@@ -2,7 +2,12 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router/index'
 import VueLazyload from 'vue-lazyload'
+import store from "./store/index"
 
+import FastClick from "fastclick"
+
+// 引入我们自定义的插件
+import toast from  "components/common/toast/index"
 
 Vue.config.productionTip = false
 
@@ -15,9 +20,16 @@ Vue.use(VueLazyload, {
 // 自定义事件总线
 Vue.prototype.$bus = new Vue()
 
+// 安装我们自定义的插件
+Vue.use(toast)
+
+// 解决移动端的300ms延迟
+FastClick.attach(document.body)
+
 new Vue({
   render: h => h(App),
-  router
+  router,
+  store
 }).$mount('#app')
 
 

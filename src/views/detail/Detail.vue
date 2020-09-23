@@ -5,21 +5,28 @@
     <scroll
       class="detail-content"
       ref="scroll"
-      
       :pull-up-load="true"
       @pullingUp="pullingUp"
       @scroll="contentscroll"
       :probe-type="3"
     >
-      <detail-swiper :top-images="topImages"></detail-swiper>
-      <detail-base-info :goods="goods"></detail-base-info>
-      <detail-shop-info :shop="shop"></detail-shop-info>
-      <detail-goods-info :detail-info="detailInfo" @imageLoad="imageLoad"></detail-goods-info>
-      <detail-param-info :param-info="paramInfo" ref="params"></detail-param-info>
-      <detail-comment-info :comment-info="commentInfo" ref="comment"></detail-comment-info>
-      <goods-list :goods="Recommend" ref="recommend"></goods-list>
-      <detail-base-line></detail-base-line>
+      <detail-swiper :top-images="topImages" />
+      <detail-base-info :goods="goods" />
+      <detail-shop-info :shop="shop" />
+      <detail-goods-info :detail-info="detailInfo" @imageLoad="imageLoad" />
+      <detail-param-info :param-info="paramInfo" ref="params" />
+      <detail-comment-info :comment-info="commentInfo" ref="comment" />
+      <goods-list :goods="Recommend" ref="recommend" />
+      <detail-base-line />
     </scroll>
+
+    <!-- 底部信息栏 加入购物车 -->
+    <detail-bottom-bar @addToCart="DetailaddCart" />
+
+    <!-- 返回顶部 -->
+    <back-top @click.native="backTopClick" v-show="isShowBackTop" />
+    <!-- toast提示框 -->
+    <toast :message="message" :isShow="isShow"></toast>
   </div>
 </template>
 
@@ -32,14 +39,14 @@ import DetailShopInfo from "./childComps/DetailShopInfo";
 import DetailGoodsInfo from "./childComps/DetailGoodsInfo";
 import DetailParamInfo from "./childComps/DetailParamInfo";
 import DetailCommentInfo from "./childComps/DetailCommentInfo";
-import DetailBaseLine from "./childComps/DetailBaseLine"
-
+import DetailBaseLine from "./childComps/DetailBaseLine";
+import DetailBottomBar from "./childComps/DetailBottomBar";
 import DetailTopShadow from "./childComps/DetailTopShadow";
 
 // 封装的公共组件
 import GoodsList from "components/content/goods/GoodsList";
 import Scroll from "components/common/scroll/Scroll";
-
+import Toast from "components/common/toast/Toast"
 // 封装的工具函数
 import {
   getDetail,
@@ -48,6 +55,8 @@ import {
   GoodsParam,
   getRecommend,
 } from "network/detail";
+import { backTopMixin } from "commonjs/mixin";
+import { mapActions } from "vuex";
 
 export default {
   name: "Detail",
@@ -62,8 +71,11 @@ export default {
     DetailCommentInfo, //评论信息
     GoodsList, //推荐信息
     DetailTopShadow, //顶部的底层阴影
-    DetailBaseLine,//底线
+    DetailBaseLine, //我是有底线的
+    DetailBottomBar, //底部工具栏
+    Toast,
   },
+  mixins: [backTopMixin],
   data() {
     return {
       iid: null,
@@ -78,35 +90,40 @@ export default {
       NavBarCurrentIndex: 0, //存储需要更新到子组件导航栏的选中信息
       positionY: 0,
       NavBarOpacity: 0,
+      message:'',//toast的文字
+      isShow:false,//toast的状态
     };
   },
   methods: {
-    // 1.DetailGoodsInfo里已经做过防抖处理
+    ...mapActions(['addCart']),
+
+    // DetailGoodsInfo里已经做过防抖处理
     imageLoad() {
       this.$refs.scroll.refresh();
-
       if (this.themeTopY != []) {
         this.themeTopY.push(0);
-        this.themeTopY.push(this.$refs.params.$el.offsetTop);
-        this.themeTopY.push(this.$refs.comment.$el.offsetTop);
-        this.themeTopY.push(this.$refs.recommend.$el.offsetTop);
+        this.themeTopY.push(this.$refs.params.$el.offsetTop - 44);
+        this.themeTopY.push(this.$refs.comment.$el.offsetTop - 44);
+        this.themeTopY.push(this.$refs.recommend.$el.offsetTop - 44);
         this.themeTopY.push(Number.MAX_VALUE); //方便后边判读 提高运算速度
       }
-      console.log(this.themeTopY);
     },
-    // 2.导航栏点击
+    // 导航栏点击
     NavBarClick(index) {
-      this.$refs.scroll.scrollTo(0, -this.themeTopY[index] + 44, 0);
+      this.$refs.scroll.scrollTo(0, -this.themeTopY[index], 0);
     },
 
     // pullingUp
     pullingUp() {
       this.$refs.scroll.finishPullUp(); //每次上拉结束后，需要执行这个操作
     },
-    // 3.监听页面滚动 并且更新子组件选中状态
+    // 监听页面滚动 并且更新子组件选中状态
     contentscroll(position) {
+      // 判断当前位置来确定是否显示返回顶部按钮
+      this.isShowBackTop = -position.y > 500;
+
       // 1.获取Y值
-      this.positionY = -position.y + 44;
+      this.positionY = -position.y;
 
       // 2.1 这种方法不够灵活，而且调用频繁
       // if (this.positionY >= 0 && this.positionY < this.themeTopY[1]) {
@@ -145,6 +162,36 @@ export default {
         this.NavBarOpacity = 0;
       }
     },
+
+    // 添加到购物车
+    DetailaddCart() {
+      // 1.获取购物车需要展示的信息
+      const product = {};
+      product.image = this.topImages;
+      product.title = this.goods.title;
+      product.desc = this.goods.desc;
+      product.price = this.goods.realPrice;
+      product.iid = this.iid;
+      product.shopName = this.shop.name;
+      product.count = 1;
+
+      // 2.将我们的商品添加到购物车
+      // 方案一
+      this.addCart(product).then(res => {
+        console.log(res);
+        this.isShow = true
+        this.message = res
+
+        setTimeout(()=>{
+          this.isShow = false
+          this.message = res
+        },1500)
+      })
+      // 方案二
+      // this.$store.dispatch("addCart", product).then((res) => {
+      //   console.log(res);
+      // });
+    },
   },
   created() {
     // 1.保存传入的iid
@@ -152,6 +199,7 @@ export default {
 
     // 2.根据iid请求数据
     getDetail(this.iid).then((res) => {
+      // console.log(res);
       const data = res.result;
       // 1.获取顶部的图片轮播数据
       this.topImages = data.itemInfo.topImages;
@@ -191,14 +239,14 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 #detail {
   position: relative;
   z-index: 1000;
   background-color: white;
 }
 .detail-content {
-  height: calc(100vh);
+  height: calc(100vh - 49px);
   overflow: hidden;
 }
 .opacity {
