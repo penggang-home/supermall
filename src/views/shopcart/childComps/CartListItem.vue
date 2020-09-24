@@ -1,7 +1,10 @@
 <template>
   <div id="shopping-cart-list-item">
     <div class="item-selector">
-      <check-button :is-checked="product.checked" @click.native="checkButtonClick"></check-button>
+      <check-button
+        :is-checked="product.checked"
+        @click.native="checkButtonClick"
+      ></check-button>
     </div>
     <div class="item-img">
       <img :src="product.image[0]" alt="商品图片" />
@@ -9,17 +12,17 @@
     <div class="item-info">
       <div class="item-name">
         <img src="~assets/img/profile/vip.svg" height="48" width="48" />
-        {{product.shopName}}
+        {{ product.shopName }}
       </div>
-      <div class="item-msg">{{product.title}}</div>
-      <div class="item-desc">{{product.desc}}</div>
+      <div class="item-msg">{{ product.title }}</div>
+      <div class="item-desc">{{ product.desc }}</div>
       <!-- <div class="item-msg">颜色：{{product.productStyleMsg}}，&nbsp;尺码：{{product.productSizeMsg}}</div> -->
       <div class="info-bottom">
-        <div class="item-price left">¥{{product.price}}</div>
+        <div class="item-price left">¥{{ price }}</div>
         <div class="item-count right">
-          <div>－</div>
-          <div>{{product.count}}</div>
-          <div>＋</div>
+          <div @click="reduce">－</div>
+          <div>{{ product.count }}</div>
+          <div @click="add">＋</div>
         </div>
       </div>
     </div>
@@ -27,10 +30,11 @@
 </template>
 
 <script>
-
 // 公共组件
-import CheckButton from "components/content/checkbutton/CheckButton"
+import CheckButton from "components/content/checkbutton/CheckButton";
 
+// 公共函数
+import { mapMutations } from "vuex";
 
 export default {
   name: "ShoppingCartListItem",
@@ -46,9 +50,29 @@ export default {
     },
   },
   methods: {
-    checkButtonClick(){
-      this.product.checked = !this.product.checked
-    }
+    ...mapMutations(["shopReduce", "shopAdd"]),
+    checkButtonClick() {
+      this.product.checked = !this.product.checked;
+    },
+    reduce() {
+      if (this.product.count === 1) {
+        this.$toast.show("不能再减了~");
+      } else {
+        this.shopReduce(this.product);
+      }
+    },
+    add() {
+      if (this.product.count >= 10) {
+        this.$toast.show("限购十件~");
+      } else {
+        this.shopAdd(this.product);
+      }
+    },
+  },
+  computed: {
+    price() {
+      return (this.product.price * this.product.count).toFixed(2);
+    },
   },
 };
 </script>
@@ -58,7 +82,7 @@ export default {
   width: 100%;
   display: flex;
   font-size: 0;
-  padding: 5px;
+  padding: 10px;
   border-bottom: 1px solid #ccc;
 }
 

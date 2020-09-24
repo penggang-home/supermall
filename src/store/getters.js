@@ -3,6 +3,7 @@ export default {
     return state.cartList.length
   },
   cartList(state) {
+    console.log(state);
     return state.cartList
   },
 }

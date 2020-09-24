@@ -122,27 +122,8 @@ export default {
       // 判断当前位置来确定是否显示返回顶部按钮
       this.isShowBackTop = -position.y > 500;
 
-      // 1.获取Y值
+      // 获取Y值
       this.positionY = -position.y;
-
-      // 2.1 这种方法不够灵活，而且调用频繁
-      // if (this.positionY >= 0 && this.positionY < this.themeTopY[1]) {
-      //   this.NavBarCurrentIndex = 0;
-      // } else if (
-      //   this.positionY >= this.themeTopY[1] &&
-      //   this.positionY < this.themeTopY[2]
-      // ) {
-      //   this.NavBarCurrentIndex = 1;
-      // } else if (
-      //   this.positionY >= this.themeTopY[2] &&
-      //   this.positionY < this.themeTopY[3]
-      // ) {
-      //   this.NavBarCurrentIndex = 2;
-      // } else {
-      //   this.NavBarCurrentIndex = 3;
-      // }
-
-      // 2.2 大神写法
       for (let i = 0; i < this.themeTopY.length - 1; i++) {
         if (
           this.NavBarCurrentIndex !== i &&
@@ -178,19 +159,11 @@ export default {
       // 2.将我们的商品添加到购物车
       // 方案一
       this.addCart(product).then(res => {
+        // 调用自己封装的插件
         console.log(res);
-        this.isShow = true
-        this.message = res
-
-        setTimeout(()=>{
-          this.isShow = false
-          this.message = res
-        },1500)
+        this.$toast.show(res)
+        // this.$toast.show('请稍等~',300,true)
       })
-      // 方案二
-      // this.$store.dispatch("addCart", product).then((res) => {
-      //   console.log(res);
-      // });
     },
   },
   created() {

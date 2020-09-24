@@ -4,15 +4,20 @@
       <check-button :is-checked="allCheckedState" />
       <span>全选</span>
     </div>
-    <div class="cart-total">
-      合计:
-      <span class="total-price">{{totalPrice}}</span>
+    <div v-show="!isModify" class="bottom-menu">
+      <div class="cart-total">
+        合计:
+        <span class="total-price">{{ totalPrice }}</span>
+      </div>
+      <div class="cart-submit" @click="submit">
+        <span class="submit" :class="{ hide: checkLength == 0 }">
+          结算
+          <span>({{ checkLength }})</span>
+        </span>
+      </div>
     </div>
-    <div class="cart-submit" @click="submit">
-      <span class="submit" :class="{hide:checkLength == 0}">
-        结算
-        <span>({{checkLength}})</span>
-      </span>
+    <div v-show="isModify" @click="deleteShop">
+      <span class="bottom-delete"> 删除 </span>
     </div>
   </div>
 </template>
@@ -21,12 +26,20 @@
 // 公共组件
 import CheckButton from "components/content/checkbutton/CheckButton";
 
+
 export default {
   name: "CartBottomBar",
   components: {
     CheckButton,
   },
+  props: {
+    isModify: {
+      type: Boolean,
+      default: false,
+    },
+  },
   methods: {
+    // 选中全部
     checkAllClick() {
       if (this.allCheckedState) {
         //全部选中改为不选中
@@ -36,11 +49,17 @@ export default {
         this.$store.getters.cartList.forEach((item) => (item.checked = true));
       }
     },
+    // 结算
     submit() {
-      // this.$toast.show("购买成功", 1500);
-      if(this.checkLength === 0){
-        this.$toast.show('请选择宝贝哦~')
+      if (this.checkLength === 0) {
+        this.$toast.show("请选择宝贝哦~");
+      } else {
+        this.$toast.show("请稍等", 400, true);
       }
+    },
+    //删除
+    deleteShop() {
+      console.log('删除');
     },
   },
   computed: {
@@ -67,15 +86,6 @@ export default {
     },
     // 判断是否全部选中 数字取反都返回 false 只有0,-0返回true
     allCheckedState() {
-      // 方案一
-      // return !this.$store.state.cartList.filter(item => {
-      //   return item.checked == false
-      // }).length
-
-      // 方案二
-      // 如果找到数据则返回对象 对象取反返回false  没找到数据返回undefined undefined取反返回true
-      // return !this.$store.state.cartList.find(item => item.checked == false)
-
       // 方案三
       // 判断总长度是否等于选中的长度
       if (this.$store.state.cartList.length === 0) {
@@ -85,7 +95,6 @@ export default {
       }
     },
   },
-
 };
 </script>
 
@@ -116,13 +125,17 @@ export default {
 .allChecked span {
   padding-left: 2px;
 }
-.cart-total {
+.bottom-menu {
+  flex: 1;
+  display: flex;
+}
+.bottom-menu .cart-total {
   flex: 2;
   display: flex;
   justify-content: flex-end;
   align-items: center;
 }
-.cart-submit {
+.bottom-menu .cart-submit {
   flex: 1;
 }
 .total-price {
@@ -142,5 +155,24 @@ export default {
 }
 .hide {
   color: rgba(255, 255, 255, 0.5);
+}
+.bottom-delete {
+  color: #fc0a0a;
+  border: 1px solid #fc0a0a;
+  font-size: 15px;
+  line-height: 15px;
+  padding: 6px 15px;
+  text-align: center;
+  border-radius: 80px;
+  white-space: nowrap;
+  margin-left: 10px;
+}
+.overlay-alert {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
 }
 </style>

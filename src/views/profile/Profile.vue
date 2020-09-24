@@ -1,46 +1,53 @@
 <template>
-  <div>
-    <scroll class="content">
-      <ul>
-        <li>121</li>
-        <li>122</li>
-        <li>123</li>
-        <li>124</li>
-        <li>125</li>
-        <li>126</li>
-        <li>127</li>
-        <li>128</li>
-        <li>129</li>
-        <li>1210</li>
-        <li>1211</li>
-        <li>1212</li>
-        <li>1213</li>
-        <li>1214</li>
-        <li>1215</li>
-        <li>1216</li>
-        <li>1217</li>
-        <li>1218</li>
-        <li>1219</li>
-        <li>1220</li>
-      </ul>
-    </scroll>
+  <div id="profile">
+    <nav-bar class="nav-bar"><div slot="center">我的档案</div></nav-bar>
+    <user-info :avatar="avatar" />
+    <account-info />
+    <normal-list-view :list-data="orderList" />
+    <normal-list-view :list-data="serviceList" />
   </div>
 </template>
 
 <script>
-import Scroll from "components/common/scroll/Scroll"
+import NavBar from "components/common/navbar/NavBar";
+
+import UserInfo from "./childComponents/UserInfo";
+import AccountInfo from "./childComponents/AccountInfo";
+import NormalListView from "./childComponents/NormalListView";
+
 export default {
-  name: 'Profile',
-  components:{
-    Scroll
-  }
-}
+  name: "Profile",
+  components: {
+    NavBar,
+    UserInfo,
+    AccountInfo,
+    NormalListView,
+  },
+  data() {
+    return {
+      avatar:'avatar.svg',
+      orderList: [
+        { icon: "message.svg", info: "消息" },
+        { icon: "pointer.svg", info: "积分" },
+        { icon: "vip.svg", info: "VIP会员专属" },
+      ],
+      serviceList: [
+        { icon: "cart.svg", info: "我的购物车" },
+        { icon: "shopping.svg", info: "下载购物APP" },
+        { icon: "settings.svg", info: "设置" },
+      ],
+    };
+  },
+};
 </script>
 
-<style scoped> 
-.content{
-  height: 300px;
-  background-color: green;
-  overflow: hidden;
+<style scoped>
+#profile {
+  background-color: #f2f2f2;
+}
+
+.nav-bar {
+  background-color: var(--color-tint);
+  color: #fff;
 }
 </style>

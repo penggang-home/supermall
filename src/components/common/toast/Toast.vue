@@ -1,6 +1,12 @@
 <template>
   <div class="toast" v-show="isShow">
-    <div>{{message}}</div>
+    <div>
+      <div v-if="!isLoadding">{{ message }}</div>
+      <div v-else class="toast-img">
+        <img src="./img/loadding.gif" alt="" />
+        {{ message }}
+      </div>
+    </div>
   </div>
 </template>
 
@@ -11,16 +17,29 @@ export default {
     return {
       message: "",
       isShow: false,
+      isLoadding: false,
     };
   },
   methods: {
-    show(message='默认文字', timer=1500) {
-      this.message = message;
-      this.isShow = true;
+    // 文子 延迟时间 是否显示loadding图片
+    show(message, timer = 1500, loadding = 'false') {
+      if (loadding == 'false') {
+        this.message = message;
+        this.isShow = true;
 
-      setTimeout(() => {
-        this.isShow = false;
-      }, timer);
+        setTimeout(() => {
+          this.isShow = false;
+        }, timer);
+      } else {
+        this.isLoadding = loadding;
+        this.message = message;
+        this.isShow = true;
+
+        setTimeout(() => {
+          this.isLoadding = false;
+          this.isShow = false;
+        }, timer);
+      }
     },
   },
 };
@@ -39,12 +58,21 @@ export default {
   -o-transform: translateX(-50%) translateY(-50%);
   transform: translateX(-50%) translateY(-50%);
   text-align: center;
-  border-radius: 5px;
+  border-radius: 8px;
   color: #fff;
   background: rgba(17, 17, 17, 0.7);
-  height: 45px;
-  line-height: 45px;
+  height: 60px;
+  line-height: 60px;
   padding: 0 15px;
-  max-width: 150px;
+  max-width: 200px;
+}
+.toast-img {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.toast-img img {
+  width: 30px;
+  height: 30px;
 }
 </style>

@@ -12,7 +12,7 @@ export default {
       } else {
         // context.state.cartList.push(oldProduct)
         context.commit('addToCart', payload)
-        resolve('加入购物车成功')
+        resolve('加入购物车成功~')
       }
     })
   },

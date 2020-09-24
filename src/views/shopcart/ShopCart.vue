@@ -3,13 +3,14 @@
     <!-- 导航 -->
     <nav-bar class="nav-bar">
       <div slot="center">购物车({{length}})</div>
+      <div slot="right" @click="modify">{{modifyStr}}</div>
     </nav-bar>
 
     <!-- 商品列表 -->
     <cart-list />
 
     <!-- 底部汇总 -->
-    <cart-bottom-bar/>
+    <cart-bottom-bar :is-modify="isModify"/>
   </div>
 </template>
 
@@ -31,10 +32,23 @@ export default {
     CartList,//商品列表
     CartBottomBar,//底部工具栏
   },
+  data() {
+    return {
+      isModify:false
+    }
+  },
   computed: {
     ...mapGetters({
       length: "cartLength",
     }),
+    modifyStr(){
+      return this.isModify ? '完成' : '管理'
+    }
+  },
+  methods: {
+    modify(){
+      this.isModify = !this.isModify
+    }
   },
 };
 </script>

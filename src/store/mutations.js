@@ -7,5 +7,21 @@ export default {
   addToCart(state, payload) {
     payload.checked = true
     state.cartList.push(payload)
+  },
+  // 商品数量减一
+  shopReduce(state,payload){
+    state.cartList.find(item => {
+      if(item.iid == payload.iid){
+        item.count--
+      }
+    })
+  },
+  // 商品数量加一
+  shopAdd(state,payload){
+    state.cartList.find(item => {
+      if(item.iid == payload.iid){
+        item.count++
+      }
+    })
   }
 }
